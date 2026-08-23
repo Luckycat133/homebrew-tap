@@ -41,6 +41,6 @@ class Traecnclaw < Formula
   end
 
   test do
-    assert_match "USAGE", shell_output("#{bin}/traecn help")
+    assert_match "USAGE", shell_output("#{bin}/traecnclaw help")
   end
 end
