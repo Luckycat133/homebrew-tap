@@ -1,8 +1,10 @@
+require "json"
+
 class Traecnclaw < Formula
   desc "Local-first MCP server and Agent Skill for TraeCN desktop automation"
   homepage "https://github.com/Luckycat133/traecnclaw-mcp-skill"
-  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.5.8/traecnclaw-0.5.8.tgz"
-  sha256 "c34851d19205e1ca8be6da542b5401a24e29ffb6d92206b3ce64e0652c836ae0"
+  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.5.9/traecnclaw-0.5.9.tgz"
+  sha256 "f910bec6aae0e2b73fbecc843471175a5fb35ab8e89c1150a182ae9ae77bf196"
   license "MIT"
 
   depends_on "node" => [:build, :run]
@@ -10,37 +12,58 @@ class Traecnclaw < Formula
   def install
     (libexec/"lib").install Dir["*"]
     cd libexec/"lib" do
-      system Formula["node"].opt_bin/"npm", "install", "--omit=dev", "--ignore-scripts",
+      system formula_opt_bin("node")/"npm", "install", "--omit=dev", "--ignore-scripts",
              "--no-audit", "--no-fund"
     end
 
     (bin/"traecnclaw-mcp").write_env_script(
       libexec/"lib/mcp-server.js",
-      PATH: "#{Formula["node"].opt_bin}:/usr/bin:/bin:/usr/sbin:/sbin"
+      PATH: "#{formula_opt_bin("node")}:/usr/bin:/bin:/usr/sbin:/sbin",
     )
     chmod 0755, bin/"traecnclaw-mcp"
 
     (bin/"traecnclaw").write_env_script(
       libexec/"lib/scripts/traecn-cli.js",
-      PATH: "#{Formula["node"].opt_bin}:/usr/bin:/bin:/usr/sbin:/sbin"
+      PATH: "#{formula_opt_bin("node")}:/usr/bin:/bin:/usr/sbin:/sbin",
     )
     chmod 0755, bin/"traecnclaw"
   end
 
   def caveats
     <<~EOS
-      TRAECNclaw drives the TraeCN desktop IDE on this Mac through its local
-      gateway. Start the gateway and follow first-use setup with:
+      TRAECNclaw runs beside TraeCN on this Mac. Complete local setup with:
 
-        traecn help
-        traecn quickstart
+        traecnclaw doctor
+        traecnclaw quickstart --launch-trae
+        traecnclaw service start
+        traecnclaw setup-mcp
 
-      MCP clients connect to the stdio server at:
-        #{opt_bin}/traecnclaw-mcp
+      The Homebrew package installs the operator CLI and stdio server. Install
+      the Agent Skill separately with the command shown by the public README.
     EOS
   end
 
   test do
-    assert_match "USAGE", shell_output("#{bin}/traecnclaw help")
+    assert_match "setup-mcp", shell_output("#{bin}/traecnclaw help")
+
+    messages = [
+      {
+        jsonrpc: "2.0",
+        id:      1,
+        method:  "initialize",
+        params:  {
+          protocolVersion: "2025-11-25",
+          capabilities:    {},
+          clientInfo:      { name: "homebrew-test", version: "1" },
+        },
+      },
+      { jsonrpc: "2.0", method: "notifications/initialized", params: {} },
+      { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
+    ]
+    output = pipe_output("#{bin}/traecnclaw-mcp", "#{messages.map(&:to_json).join("\n")}\n")
+    tools = output.lines.map { |line| JSON.parse(line) }.find { |item| item["id"] == 2 }.dig("result", "tools")
+    assert_equal 20, tools.length
+    assert_equal "traecn_send_message", tools.first["name"]
+    assert_equal "traecn_decide_approval", tools.last["name"]
   end
 end
