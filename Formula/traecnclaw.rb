@@ -1,8 +1,8 @@
 class Traecnclaw < Formula
   desc "Local-first MCP server and Agent Skill for TraeCN desktop automation"
   homepage "https://github.com/Luckycat133/traecnclaw-mcp-skill"
-  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.5.7/traecnclaw-0.5.7.tgz"
-  sha256 "4d664e6426175e5e5404ec748b4ea7ed45602edb6b9752cbc48ee7edea68f31f"
+  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.5.8/traecnclaw-0.5.8.tgz"
+  sha256 "c34851d19205e1ca8be6da542b5401a24e29ffb6d92206b3ce64e0652c836ae0"
   license "MIT"
 
   depends_on "node" => [:build, :run]
