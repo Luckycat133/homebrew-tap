@@ -7,7 +7,7 @@ class Traecnclaw < Formula
   sha256 "f910bec6aae0e2b73fbecc843471175a5fb35ab8e89c1150a182ae9ae77bf196"
   license "MIT"
 
-  depends_on "node" => [:build, :run]
+  depends_on "node"
 
   def install
     (libexec/"lib").install Dir["*"]
@@ -60,7 +60,7 @@ class Traecnclaw < Formula
       { jsonrpc: "2.0", method: "notifications/initialized", params: {} },
       { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
     ]
-    output = pipe_output("#{bin}/traecnclaw-mcp", "#{messages.map(&:to_json).join("\n")}\n")
+    output = pipe_output(bin/"traecnclaw-mcp", "#{messages.map(&:to_json).join("\n")}\n")
     tools = output.lines.map { |line| JSON.parse(line) }.find { |item| item["id"] == 2 }.dig("result", "tools")
     assert_equal 20, tools.length
     assert_equal "traecn_send_message", tools.first["name"]
