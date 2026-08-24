@@ -3,8 +3,8 @@ require "json"
 class Traecnclaw < Formula
   desc "Local-first MCP server and Agent Skill for TraeCN desktop automation"
   homepage "https://github.com/Luckycat133/traecnclaw-mcp-skill"
-  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.5.9/traecnclaw-0.5.9.tgz"
-  sha256 "f910bec6aae0e2b73fbecc843471175a5fb35ab8e89c1150a182ae9ae77bf196"
+  url "https://github.com/Luckycat133/traecnclaw-mcp-skill/releases/download/v0.6.0/traecnclaw-0.6.0.tgz"
+  sha256 "ae7c2a9170e4525bb2b0bab8f9009c8a19ce7b68ff298bbceccc9e6fbbeb9f33"
   license "MIT"
 
   depends_on "node"
